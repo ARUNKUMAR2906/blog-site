@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <title>Blogs</title>
+  </head>
+  <body>
+    <div class="">
+      <%- include('./partials/Navbar.ejs') %>
+      <!-- Blog Section -->
+      <div class="max-w-lg mx-auto my-4">
+        <% if (locals.user && user.role == "Admin") { %>
+         <button class="bg-red-500 px-4 py-3 rounded-lg my-4"><a class="" href="/blog/delete/<%= blog._id %>">Delete Post</a></button>
+        <% } %>
+        <img src="/uploads/<%= blog.coverImage %>" alt="" class="rounded-lg" />
+        <div class="break-words px-4">
+          <h1 class="text-center text-xl font-bold my-4"><%= blog.title %></h1>
+          <p class=""><%= blog.content %></p>
+          <p class="my-4">Posted By : <%= blog.createdBy.fullname %></p>
+        </div>
+      </div>
+      <% if (locals.user) { %>
+      <div class="max-w-lg mx-auto my-4">
+        <h1 class="font-bold">Leave your comments</h1>
+        <input
+          type="text"
+          name="comment"
+          id="comment"
+          class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-primary-600 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 my-2"
+          placeholder="comment..."
+        />
+        <button
+          id="comment-btn"
+          class="bg-green-500 text-white text-center px-5 py-2 rounded-lg"
+        >
+          Post
+        </button>
+      </div>
+      <% } %>
+      <div class="max-w-xl mx-auto my-4">
+        <h2 class="font-bold">Comments(<%= comments.length %>)</h2>
+        <% if (comments && comments.length > 0) { %>
+          <% comments.forEach(comment => { %>
+            <div class="bg-gray-100 rounded-lg p-4 my-2">
+              <p><%= comment.content %></p>
+              <small>By <%= comment.createdBy.fullname %> on <%= comment.createdAt.toDateString() %></small>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No comments yet. Be the first to comment!</p>
+        <% } %>
+      </div>
+    </div>
+    <script>
+      const blogId = "<%= blog._id %>";
+      const input = document.getElementById("comment");
+      const btn = document.getElementById("comment-btn");
+
+      btn.addEventListener("click", createComment);
+      async function createComment() {
+        try {
+          btn.disabled = true; // Disable button to prevent multiple submissions
+          btn.textContent = "Posting...";
+
+          const response = await fetch("/comment/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ blogId, content: input.value }),
+          });
+
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            alert("Failed to post comment. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error posting comment:", error);
+          alert("An error occurred. Please try again.");
+        } finally {
+          btn.disabled = false; // Re-enable button
+          btn.textContent = "Post";
+        }
+      }
+    </script>
+  </body>
+</html>
