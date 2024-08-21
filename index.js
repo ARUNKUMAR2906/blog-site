@@ -16,7 +16,9 @@ dotenv.config();
 
 // database connection
 mongoose
-  .connect(process.env.mongoDB_URL)
+  .connect(process.env.mongoDB_URL, {
+    connectTimeoutMS: 30000, // Set to 30 seconds or more
+  })
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => console.log("Error while connecting to MongoDB:", err));
 
