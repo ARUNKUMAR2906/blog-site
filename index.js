@@ -16,9 +16,12 @@ dotenv.config();
 
 // database connection
 mongoose
-  .connect(process.env.mongoDB_URL)
-  .then(() => console.log("mogoDB connected successfully"))
-  .catch((err) => console.log("Error while connecting mongoDB"));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB connected successfully"))
+  .catch((err) => console.log("Error while connecting to MongoDB:", err));
 
 // configuration
 app.set("view engine", "ejs");
